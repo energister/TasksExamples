@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace TaskExamples.Tests
 {
     [TestFixture]
-    public class ContinueWithTests
+    public class ContinueWithOnCanceledTaskTests
     {
         private readonly TimeSpan timeout = TimeSpan.FromSeconds(2);
         
@@ -13,7 +13,7 @@ namespace TaskExamples.Tests
         public void RunToCompletionWhileFirstIsCanceled()
         {
             /* Arrange */
-            Task<int> firstTask = CreateCanceledTask();
+            Task<int> firstTask = TasksHelper.CreateCanceledTask();
 
             /* Act */
             Task<int> result = firstTask
@@ -24,10 +24,10 @@ namespace TaskExamples.Tests
         }
 
         [Test]
-        public void SecondTaskWhileFirstIsCanceled()
+        public void NextTaskInChainWhilePreviousIsCanceled()
         {
             /* Arrange */
-            Task<int> firstTask = CreateCanceledTask();
+            Task<int> firstTask = TasksHelper.CreateCanceledTask();
 
             /* Act */
             Task<int> result = firstTask
@@ -37,15 +37,11 @@ namespace TaskExamples.Tests
             Assert.Throws<AggregateException>(() => result.Wait(timeout));
             TaskCanceledException exception = (TaskCanceledException) result.Exception.Flatten().InnerException;
             Assert.NotNull(exception);
-            Assert.AreEqual(TaskStatus.Faulted, result.Status);
-        }
 
-        private static Task<int> CreateCanceledTask()
-        {
-            var tcs = new TaskCompletionSource<int>();
-            tcs.SetCanceled();
-            Task<int> aTask = tcs.Task;
-            return aTask;
+            // status
+            Assert.AreEqual(TaskStatus.Faulted, result.Status);
+            Assert.True(result.IsFaulted);
+            Assert.False(result.IsCanceled);
         }
     }
 }

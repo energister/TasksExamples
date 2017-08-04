@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
-namespace TaskExamples.Tests
+namespace TaskExamples
 {
     internal static class AdditionalAssertions
     {
         private static readonly TimeSpan timeout = TimeSpan.FromSeconds(2);
         
-        public static void IsCanceled(Task task)
+        public static void WaitIsCanceled(Task task)
         {
             Assert.Throws<AggregateException>(() => task.Wait(timeout));
-            Assert.AreEqual(TaskStatus.Canceled, task.Status);
+            Assert.Equal(TaskStatus.Canceled, task.Status);
+            Assert.True(task.IsCanceled);
         }
     }
 }
