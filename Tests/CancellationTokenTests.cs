@@ -35,7 +35,7 @@ namespace TaskExamples.Tests
             Task task = Task.Run(() => ThrowAfterSomeTimeIfCancellationRequested(source.Token));
 
             /* Assert */
-            task.WaitUntilCompleted();
+            task.WaitSafe();
             Assert.Equal(TaskStatus.Faulted, task.Status);
             Assert.NotNull(task.Exception);
         }

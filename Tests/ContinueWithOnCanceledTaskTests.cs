@@ -1,45 +1,68 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace TaskExamples.Tests
 {
-    [TestFixture]
     public class ContinueWithOnCanceledTaskTests
     {
         private readonly TimeSpan timeout = TimeSpan.FromSeconds(2);
-        
-        [Test]
-        public void RunToCompletionWhileFirstIsCanceled()
+
+        [Fact]
+        public void RunToCompletionContinuationOptionWhileFirstIsCanceled()
         {
             /* Arrange */
-            Task<int> firstTask = TasksHelper.CreateCanceledTask();
+            Task<int> canceled = Factory.CreateCanceledTask();
 
             /* Act */
-            Task<int> result = firstTask
+            Task<int> second = canceled
                 .ContinueWith(t => t.Result + 5, TaskContinuationOptions.OnlyOnRanToCompletion);
 
             /* Assert */
-            AdditionalAssertions.IsCanceled(result);
-        }
+            AdditionalAssertions.WaitIsCanceled(second);
+            Assert.Null(second.Exception);
+        }     
 
-        [Test]
+        [Fact]
         public void NextTaskInChainWhilePreviousIsCanceled()
         {
             /* Arrange */
-            Task<int> firstTask = TasksHelper.CreateCanceledTask();
+            Task<int> canceled = Factory.CreateCanceledTask();
 
             /* Act */
-            Task<int> result = firstTask
+            Task<int> result = canceled
                 .ContinueWith(t => t.Result + 5);
 
             /* Assert */
+            result.WaitSafe();
             Assert.Throws<AggregateException>(() => result.Wait(timeout));
             TaskCanceledException exception = (TaskCanceledException) result.Exception.Flatten().InnerException;
             Assert.NotNull(exception);
 
             // status
-            Assert.AreEqual(TaskStatus.Faulted, result.Status);
+            Assert.Equal(TaskStatus.Faulted, result.Status);
+            Assert.True(result.IsFaulted);
+            Assert.False(result.IsCanceled);
+        }
+
+        [Fact]
+        public void NextTaskInChainWhilePreviousIsFaulted()
+        {
+            /* Arrange */
+            Task<int> canceled = Task.FromException<int>(new ApplicationException());
+
+            /* Act */
+            Task<int> result = canceled
+                .ContinueWith(t => t.Result + 5);
+
+            /* Assert */
+            result.WaitSafe();
+            Assert.Throws<AggregateException>(() => result.Wait(timeout));
+            TaskCanceledException exception = (TaskCanceledException) result.Exception.Flatten().InnerException;
+            Assert.NotNull(exception);
+
+            // status
+            Assert.Equal(TaskStatus.Faulted, result.Status);
             Assert.True(result.IsFaulted);
             Assert.False(result.IsCanceled);
         }

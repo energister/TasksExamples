@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TaskExamples
@@ -15,6 +16,11 @@ namespace TaskExamples
             var cts = new CancellationTokenSource();
             cts.Cancel();
             return Task.FromCanceled<int>(cts.Token);
+        }
+
+        public static Task<int> CreateFaultedTask()
+        {
+            return Task.FromException<int>(new ApplicationException());
         }
     }
 }

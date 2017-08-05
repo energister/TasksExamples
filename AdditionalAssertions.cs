@@ -12,7 +12,12 @@ namespace TaskExamples
         {
             Assert.Throws<AggregateException>(() => task.Wait(timeout));
             Assert.Equal(TaskStatus.Canceled, task.Status);
-            Assert.True(task.IsCanceled);
+        }
+
+        public static void WaitIsFaulted(Task task)
+        {
+            task.WaitSafe();
+            Assert.Equal(TaskStatus.Faulted, task.Status);
         }
     }
 }

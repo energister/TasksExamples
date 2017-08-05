@@ -68,6 +68,7 @@
     <Compile Include="Tests\ContinueWithOnCanceledTaskTests.cs" />
     <Compile Include="Factory.cs" />
     <Compile Include="Tests\CancellationTokenTests.cs" />
+    <Compile Include="Tests\HowToBuildChainWhichWillActLikeFirstTask.cs" />
     <Compile Include="Tests\TaskStatusTests.cs" />
   </ItemGroup>
   <ItemGroup>
