@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -34,8 +35,8 @@ namespace TaskExamples.Tests
 
             Assert.Null(task.Exception);
 
-            Assert.Throws<AggregateException>(() => task.Result);
-            Assert.Throws<AggregateException>(() => task.Wait());
+            AdditionalAssertions.ThrowsTaskCanceledException(() => task.Result);
+            AdditionalAssertions.ThrowsTaskCanceledException(() => task.Wait(0));
         }
 
         [Fact]
@@ -51,8 +52,8 @@ namespace TaskExamples.Tests
 
             Assert.NotNull(task.Exception);
 
-            Assert.Throws<AggregateException>(() => task.Result);
-            Assert.Throws<AggregateException>(() => task.Wait());
+            AggregateException resultException = Assert.Throws<AggregateException>(() => task.Result);
+            AggregateException waitException = Assert.Throws<AggregateException>(() => task.Wait());
         }
     }
 }

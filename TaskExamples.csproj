@@ -65,7 +65,7 @@
     <Compile Include="AdditionalAssertions.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="Tests\CalculateResultUponTwoTasksTests.cs" />
-    <Compile Include="Tests\ContinueWithOnCanceledTaskTests.cs" />
+    <Compile Include="Tests\ContinueWithTests.cs" />
     <Compile Include="Factory.cs" />
     <Compile Include="Tests\CancellationTokenTests.cs" />
     <Compile Include="Tests\HowToBuildChainWhichWillActLikeFirstTask.cs" />
