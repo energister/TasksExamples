@@ -13,7 +13,7 @@ namespace TaskExamples.Tests
     /// </summary>
     public class CancellationTokenTests
     {
-        private static void ThrowAfterSomeTimeIfCancellationRequested(CancellationToken cancellationToken)
+        private static int ThrowAfterSomeTimeIfCancellationRequested(CancellationToken cancellationToken)
         {
             string someString = string.Empty;
             for (int i = 0; ; i++)
@@ -22,6 +22,8 @@ namespace TaskExamples.Tests
                 if (i % 1000 == 0)
                     cancellationToken.ThrowIfCancellationRequested();
             }
+
+            return 5;
         }
 
         [Fact]
@@ -47,7 +49,7 @@ namespace TaskExamples.Tests
             source.CancelAfter(TimeSpan.FromSeconds(1));
 
             /* Act */
-            Task task = Task.Run(() => ThrowAfterSomeTimeIfCancellationRequested(source.Token), source.Token);
+            Task<int> task = Task.Run(() => ThrowAfterSomeTimeIfCancellationRequested(source.Token), source.Token);
 
             /* Assert */
             AdditionalAssertions.WaitIsCanceled(task);
@@ -61,10 +63,11 @@ namespace TaskExamples.Tests
             CancellationTokenSource selfCts = new CancellationTokenSource();
 
             /* Act */
-            Task task = Task.Run(() =>
+            Task<int> task = Task.Run(() =>
             {
                 selfCts.Cancel();
                 selfCts.Token.ThrowIfCancellationRequested();
+                return 5;
             }, selfCts.Token);
 
 
@@ -80,7 +83,7 @@ namespace TaskExamples.Tests
             source.Cancel();
 
             // Act
-            Task task = Task.Run(() => { }, source.Token);
+            Task<int> task = Task.Run(() => 5, source.Token);
 
             // Assert
             AdditionalAssertions.WaitIsCanceled(task);

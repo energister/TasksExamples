@@ -7,10 +7,18 @@ namespace TaskExamples
 {
     internal static class AdditionalAssertions
     {
-        public static void WaitIsCanceled(Task task)
+        /// <summary>
+        /// Every canceled task is conformed to this. No exceptions
+        /// </summary>
+        public static void WaitIsCanceled<T>(Task<T> task)
         {
             task.WaitSafe();
             Assert.Equal(TaskStatus.Canceled, task.Status);
+
+            Assert.Null(task.Exception);
+
+            AdditionalAssertions.ThrowsTaskCanceledException(() => task.Result);
+            AdditionalAssertions.ThrowsTaskCanceledException(() => task.Wait(0));
         }
 
         public static void WaitIsFaulted(Task task)

@@ -83,8 +83,7 @@ namespace TaskExamples.Tests
                 return aTask.Result + alwaysFinished.Result;
             }, selfCts.Token);
 
-            Assert.Throws<AggregateException>(() => result.Wait(timout));
-            Assert.AreEqual(TaskStatus.Canceled, result.Status);
+            AdditionalAssertions.WaitIsCanceled(result);
         }
 
 
@@ -129,8 +128,7 @@ namespace TaskExamples.Tests
 
             Task<string> result = Expression2(aTask, alwaysFinished);
 
-            Assert.Throws<AggregateException>(() => result.Wait(timout));
-            Assert.AreEqual(TaskStatus.Canceled, result.Status);
+            AdditionalAssertions.WaitIsCanceled(result);
         }
         
         [Test]

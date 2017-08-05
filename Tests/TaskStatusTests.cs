@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,6 +36,9 @@ namespace TaskExamples.Tests
 
             AdditionalAssertions.ThrowsTaskCanceledException(() => task.Result);
             AdditionalAssertions.ThrowsTaskCanceledException(() => task.Wait(0));
+
+            // same as
+            AdditionalAssertions.WaitIsCanceled(task);
         }
 
         [Fact]
