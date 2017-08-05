@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace TaskExamples.Tests
 {
@@ -11,7 +11,6 @@ namespace TaskExamples.Tests
     /// and will be canceled if one of the source tasks were canceled
     /// and will be failed if one of the source tasks were failed
     /// </summary>
-    [TestFixture]
     public class CalculateResultUponTwoTasksTests
     {
         private TimeSpan timout = TimeSpan.FromSeconds(2);
@@ -26,7 +25,7 @@ namespace TaskExamples.Tests
 
         /* Option 1: Task.Factory.ContinueWhenAll */
 
-        [Test]
+        [Fact]
         public void BothSuccess()
         {
             Task<int> aTask = Task.FromResult(0);
@@ -36,7 +35,7 @@ namespace TaskExamples.Tests
             Assert.True(result.Wait(timout));
         }
 
-        [Test]
+        [Fact]
         public void FirstFailed()
         {
             Task<int> aTask = Task.Run(new Func<int>(
@@ -50,7 +49,7 @@ namespace TaskExamples.Tests
             Assert.True(exception.Message.Contains("calculate"));
         }
 
-        [Test]
+        [Fact]
         public void FirstCanceled()
         {
             Task<int> aTask = CreateCanceledTask();
@@ -60,10 +59,10 @@ namespace TaskExamples.Tests
             Assert.Throws<AggregateException>(() => result.Wait(timout));
             TaskCanceledException exception = (TaskCanceledException)result.Exception.Flatten().InnerException;
             Assert.NotNull(exception);
-            Assert.AreEqual(TaskStatus.Faulted, result.Status);
+            Assert.Equal(TaskStatus.Faulted, result.Status);
         }
 
-        [Test]
+        [Fact]
         public void CancelResultWhenFirstIsCanceled()
         {
             CancellationTokenSource selfCts = new CancellationTokenSource();
@@ -97,7 +96,7 @@ namespace TaskExamples.Tests
                               TaskContinuationOptions.NotOnCanceled);
         }
 
-        [Test]
+        [Fact]
         public void BothSuccessOption2()
         {
             Task<int> aTask = Task.FromResult(0);
@@ -107,7 +106,7 @@ namespace TaskExamples.Tests
             Assert.True(result.Wait(timout));
         }
 
-        [Test]
+        [Fact]
         public void FirstFailedOption2()
         {
             Task<int> aTask = Task.Run(new Func<int>(
@@ -121,7 +120,7 @@ namespace TaskExamples.Tests
             Assert.True(exception.Message.Contains("calculate"));
         }
         
-        [Test]
+        [Fact]
         public void CancelResultWhenFirstIsCanceledOption2()
         {
             Task<int> aTask = CreateCanceledTask();
@@ -131,14 +130,14 @@ namespace TaskExamples.Tests
             AdditionalAssertions.WaitIsCanceled(result);
         }
         
-        [Test]
+        [Fact]
         public void UnableToSpecifyOnlyAndNotOptions()
         {
-            ArgumentOutOfRangeException ex = Assert.Throws<ArgumentOutOfRangeException>(() => Task.Factory.ContinueWhenAll(
-                new Task[] { }, tasks => { },
-                TaskContinuationOptions.OnlyOnCanceled));
-
-            Assert.AreEqual("It is invalid to exclude specific continuation kinds for continuations off of multiple tasks.\r\nParameter name: continuationOptions", ex.Message);
+//            ArgumentOutOfRangeException ex = Assert.ThrowsAsync<>()<ArgumentOutOfRangeException>(() => Task.Factory.ContinueWhenAll(
+//                new Task[] { }, tasks => { },
+//                TaskContinuationOptions.OnlyOnCanceled));
+//
+//            Assert.Equal("It is invalid to exclude specific continuation kinds for continuations off of multiple tasks.\r\nParameter name: continuationOptions", ex.Message);
         }
 
         private string Aggregate(Task<int> a, Task<string> b)
