@@ -24,8 +24,11 @@ namespace TaskExamples.Tests
 
             Assert.Null(second.Exception);
 
-            AdditionalAssertions.ThrowsTaskCanceledException(() => second.Result);
-            AdditionalAssertions.ThrowsTaskCanceledException(() => second.Wait(0));
+            AggregateException resultException = Assert.Throws<AggregateException>(() => second.Result);
+            AggregateException waitException = Assert.Throws<AggregateException>(() => second.Wait(0));
+
+            AdditionalAssertions.IsTaskCanceledAggregateException(resultException);
+            AdditionalAssertions.IsTaskCanceledAggregateException(waitException);
         }
 
         [Fact]
@@ -45,6 +48,12 @@ namespace TaskExamples.Tests
             AggregateException resultException = Assert.Throws<AggregateException>(() => result.Result);
             AggregateException waitException = Assert.Throws<AggregateException>(() => result.Wait(0));
 
+            Assert.NotNull(exception);
+
+            AdditionalAssertions.IsTaskCanceledAggregateException(exception.Flatten());
+            AdditionalAssertions.IsTaskCanceledAggregateException(resultException.Flatten());
+            AdditionalAssertions.IsTaskCanceledAggregateException(waitException.Flatten());
+
             AssertTaskCanceledAggregateExceptionInside(exception);
             AssertTaskCanceledAggregateExceptionInside(resultException);
             AssertTaskCanceledAggregateExceptionInside(waitException);
@@ -52,9 +61,7 @@ namespace TaskExamples.Tests
 
         private void AssertTaskCanceledAggregateExceptionInside(AggregateException aggregateException)
         {
-            AdditionalAssertions.IsTaskCanceledAggregateException(aggregateException.Flatten());
-
-            // or detailed structure
+            // detailed structure
             Exception innerException = aggregateException.InnerExceptions.Single();
             AdditionalAssertions.IsTaskCanceledAggregateException(innerException);
         }
